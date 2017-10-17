@@ -4,7 +4,6 @@ library(dplyr)
 URL <- "https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip"
 
 # set working directory
-setwd("~./MyProject/3 Data Cleaning/Project")
 
 # check to see if the directory exists - if not then download the zip file and extract to the working directory
 if(!file.exists("UCI HAR Dataset")) {
@@ -32,8 +31,8 @@ xtrain <- mutate(xtrain, type = "training")
 xtest <- mutate(xtest, type = "test")
 
 # match activities to training and test labels (i.e. ytrain, ytest)
-ytrain <- merge(ytrain, activity, by = "V1")
-ytest <- merge(ytest, activity, by = "V1")
+ytrain <- left_join(ytrain, activity, by = "V1")
+ytest <- left_join(ytest, activity, by = "V1")
 
 # bind subject column, activity column, and training and test datasets and add column labels representing the variables
 train <- cbind(sbjt, ytrain[,2], xtrain)
@@ -49,7 +48,7 @@ total <- rbind(train, test)
 rm(xtrain, ytrain, sbjt, xtest, ytest, sbjt_test, features, activity, labels, train, test)
 
 # extract only the measurements on the mean and standard deviation for each measurement
-stdmeanonly <- total[grep("std()|mean()", colnames(total))]
+stdmeanonly <- total[,grep("std()|mean()", colnames(total))]
 stdmeanonly <- stdmeanonly[-grep("meanFreq()", colnames(stdmeanonly))]
 stdmeanonly <- tbl_df(cbind(subject = total$subject, activity = total$activity, type = total$type, stdmeanonly))
 
